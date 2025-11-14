@@ -16,7 +16,7 @@ class JdamrControlNode(Node):
     def __init__(self):
         super().__init__('jdamr_control_node')
         # jsamr200 
-        self.robot = Jdamr200("/dev/ttyACM0")
+        self.robot = Jdamr200("/dev/ttyUSB0")
         
         self.publisher_ = self.create_publisher(String, 'jdamr_control', 10)
          # Odometry 메시지를 퍼블리싱하는 퍼블리셔 생성
@@ -60,20 +60,23 @@ class JdamrControlNode(Node):
     def cmd_vel_callback(self, msg):
         print("cmd_vel")
         go_back = msg.linear.x
-        rotate = msg.linear.y
+        rotate = msg.angular.z
         speed = int(msg.linear.z)
         if go_back > 0:
             self.robot.move_run_mode(self.robot.GO_FORWARD, speed)
-            print(speed)
+            print('go forward', go_back)
         elif go_back < 0:
             self.robot.move_run_mode(self.robot.GO_BACKWARD, speed)
-            print(speed)
+            print('go_backward', go_back)
         elif rotate > 0:
             self.robot.move_run_mode(self.robot.TURN_LEFT, speed)
+            print('left', rotate)
         elif rotate < 0:
             self.robot.move_run_mode(self.robot.TURN_RIGHT, speed)
+            print('right', rotate)
         else:
             self.robot.move_run_mode(self.robot.STOP, 0)
+            print('stop')
         # Perform actions based on the received velocities (e.g., control a robot)
         #print(f"Received linear velocity: {go_back}, angular velocity: {rotate}")
 

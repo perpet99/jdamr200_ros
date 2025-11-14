@@ -11,7 +11,7 @@ find_package(cartographer_ros REQUIRED)
 
 # Install
 install(
-  DIRECTORY launch config
+  DIRECTORY launch config rviz2
   DESTINATION share/${PROJECT_NAME}
 )
 

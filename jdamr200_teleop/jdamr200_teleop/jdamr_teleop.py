@@ -64,11 +64,11 @@ class TeleopNode(Node):
                 elif key == 'a':
                     self.x = 0.0
                     self.y = 0.5
-                    self.theta = 0.0
+                    self.theta = 1.0
                 elif key == 'd':
                     self.x = 0.0
-                    self.y = -0.5
-                    self.theta = 0.0
+                    self.y = 0.0
+                    self.theta = -1.0
                 elif key == '\x03':  # CTRL-C
                     break
                 elif key == 'u': # arrow up

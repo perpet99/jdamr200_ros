@@ -28,6 +28,15 @@ def generate_launch_description():
         'launch'
     )
 
+    # RViZ2 settings
+    rviz2_config = os.path.join(
+        get_package_share_directory('jdamr200_cartographer'),
+        'rviz2',
+        'cartographer.rviz'
+    )
+
+    print("RVIZ CONFIG", rviz2_config)
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -50,7 +59,18 @@ def generate_launch_description():
         #),
 
         
-        
+        # ✅ Static Transform 설정
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='base_link_to_base_laser_tf',
+            arguments=[
+                '0', '0', '0.18',
+                '0', '0', '0', '1',
+                'body_link',
+                'base_laser'
+            ]
+        ),
         Node(
             ## Configure the TF of the robot to the origin of the map coordinates
             # map TF to odom TF
@@ -74,6 +94,8 @@ def generate_launch_description():
         Node(
             package='rviz2',
             executable='rviz2',
+            name='rviz2_show_ld14',
+            arguments=['-d',rviz2_config],
             output='screen',
         ),
 

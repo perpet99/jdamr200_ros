@@ -93,10 +93,31 @@ def generate_launch_description():
         output='screen',
     )
 
+    # gz-sim 센서 토픽의 frame_id는 URDF 링크 이름이 아니라
+    # "<모델명>/<링크명>/<센서명>" 형태의 전체 스코프 이름으로 나온다.
+    # robot_state_publisher(URDF 기반) TF에는 그 이름이 없으므로,
+    # 실제 URDF 프레임과 identity 변환으로 이어주는 별칭 정적 TF를 추가한다.
+    laser_frame_alias = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='laser_frame_alias',
+        arguments=['0', '0', '0', '0', '0', '0',
+                   'laser_link', 'jdamr200_robot/laser_link/laser_sensor'],
+    )
+    imu_frame_alias = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='imu_frame_alias',
+        arguments=['0', '0', '0', '0', '0', '0',
+                   'base_footprint', 'jdamr200_robot/base_footprint/imu_sensor'],
+    )
+
     return LaunchDescription([
         set_model_path,
         start_gz_sim,
         robot_state_publisher_node,
         spawn_robot_node,
         bridge_node,
+        laser_frame_alias,
+        imu_frame_alias,
     ])

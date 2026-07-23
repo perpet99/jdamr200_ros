@@ -80,7 +80,7 @@ source install/setup.bash
 ros2 run jdamr200_node jdamr200_node
 
 # 터미널 2: 키보드 조작으로 cmd_vel 발행
-ros2 run jdamr200_teleop jdamr200_teleop
+ros2 run jdamr200_teleop jdamr_teleop
 ```
 
 * `jdamr200_node`는 `/cmd_vel`을 수신하여 로봇의 바퀴를 제어합니다.
@@ -89,5 +89,14 @@ ros2 run jdamr200_teleop jdamr200_teleop
 ### 2. RViz에서 로봇 모델 시각화
 
 ```bash
-ros2 launch jdamr200_bringup display.launch.py
+ros2 launch jdamr200_bringup jdamr200_urdf_launch.py
 ```
+
+### 3. Gazebo 시뮬레이션 (ROS2 Jazzy / gz-sim)
+
+```bash
+ros2 launch jdamr200_gazebo jdamr200_gazebo.launch.py
+```
+
+* gz-sim(Harmonic) 시뮬레이터에 로봇을 스폰하고, `/cmd_vel`로 구동하며 `/scan`, `/imu/data`, `/odom` 등의 센서 토픽을 확인할 수 있습니다.
+* 자세한 사전 준비 및 트러블슈팅은 [jdamr200_gazebo/how_to_use_jdamr200_gazebo_launch.md](jdamr200_gazebo/how_to_use_jdamr200_gazebo_launch.md)를 참고하세요.

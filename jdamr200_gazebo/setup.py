@@ -17,6 +17,8 @@ setup(
         (os.path.join('share', package_name, 'urdf'), glob(os.path.join('urdf', '*'))),
         # 월드 파일 설치
         (os.path.join('share', package_name, 'worlds'), glob(os.path.join('worlds', '*.world'))),
+        # 컨트롤러 설정 파일 설치
+        (os.path.join('share', package_name, 'config'), glob(os.path.join('config', '*.yaml'))),
         # meshes 폴더 
         (os.path.join('share', package_name, 'models', 'hexa', 'meshes'), 
         glob('models/hexa/meshes/*')), 

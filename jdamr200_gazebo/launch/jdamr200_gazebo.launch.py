@@ -1,7 +1,8 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable
+from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
@@ -24,6 +25,11 @@ def generate_launch_description():
     except EnvironmentError:
         print(f"ERROR: Cannot find URDF file at {jdamr200_urdf}")
         exit(1)
+
+    # URDF는 xacro가 아니라 순수 텍스트라서, gz_ros2_control 플러그인이 참조할
+    # 컨트롤러 설정 yaml의 실제 절대경로를 여기서 문자열 치환으로 넣어준다.
+    so101_controllers_yaml = os.path.join(pkg_share_dir, 'config', 'so101_controllers.yaml')
+    jdamr200_desc = jdamr200_desc.replace('SO101_CONTROLLERS_YAML_PATH', so101_controllers_yaml)
 
     robot_description = {'robot_description': jdamr200_desc}
 
@@ -112,6 +118,27 @@ def generate_launch_description():
                    'base_footprint', 'jdamr200_robot/base_footprint/imu_sensor'],
     )
 
+    # SO-101 팔 컨트롤러 (gz_ros2_control 플러그인이 로봇 스폰 시점에 controller_manager를
+    # 생성하므로, 스폰이 끝난 뒤(spawn_robot_node 프로세스 종료 이벤트)에 spawner를 실행한다)
+    joint_state_broadcaster_spawner = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['joint_state_broadcaster'],
+        output='screen',
+    )
+    so101_arm_controller_spawner = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['so101_arm_controller'],
+        output='screen',
+    )
+    delayed_controller_spawners = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=spawn_robot_node,
+            on_exit=[joint_state_broadcaster_spawner, so101_arm_controller_spawner],
+        )
+    )
+
     return LaunchDescription([
         set_model_path,
         start_gz_sim,
@@ -120,4 +147,5 @@ def generate_launch_description():
         bridge_node,
         laser_frame_alias,
         imu_frame_alias,
+        delayed_controller_spawners,
     ])
